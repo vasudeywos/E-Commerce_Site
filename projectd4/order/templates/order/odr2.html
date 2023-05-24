@@ -1,0 +1,20 @@
+{% extends "order/base.html" %}
+{% block content %}
+    {%for or in orde%}
+            <article class="media content-section">
+               <div class="media-body">
+                  <div class="article-metadata">
+                  <p>By Sales Amount-{{forloop.counter}}</p>
+                </div>
+                   <div class="col-lg-4">
+                    <img class="thumbnail" src="{{or.imageURL}}">
+                    <div class="box-element product"><h2><a class="article-title" href="{% url 'post-detail' or.id %}">Product Number-{{ or.slug }}</a></h2>
+                  <p class="article-content">Product Name-{{ or.Name }}</p>
+                    <p class="article-content">Product Category-{{ or.category }}</p>
+                        <p class="article-content">Product Left-{{ or.Quantity}}</p>
+                    <p class="article-content">Sales-{{ or.Sum}}</p>
+                        <p class="article-content">author-{{ or.author}}</p>
+               </div>
+            </article>
+    {%endfor%}
+{% endblock content %}

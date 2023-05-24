@@ -1,0 +1,79 @@
+{% extends 'order/main.html' %}
+    {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+    {% endif %}
+<style>
+    .position-top-right {
+      position: relative;
+      top: 0;
+      right: 0;
+    }
+  </style>
+{% block content %}
+        {% if customer %}
+        <div class="float-right">
+                      <div class="content-section">
+                          <p>BALANCE-{{ customer.balance }}</p>
+                        <p><strong>Wallet</strong>
+                          <ul class="list-group">
+                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'add_money'%}">Add Money</a></li>
+                          </ul>
+                        </p>
+                      </div>
+                </div>
+        {% endif %}
+        <div class="page-header">
+        <h1>Your Shopping Cart</h1>
+    </div>
+    <div class="row">
+        <table class="table">
+            <thead>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Product Left</th>
+            <th></th>
+            </thead>
+            <tbody>
+            {% for item in cart_items %}
+                <tr>
+                    <td>
+                        {{ item.product.Name }}
+                        <ul>
+                        </ul>
+                    </td>
+
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.product.Price }}</td>
+                    <td>{{ item.product.Quantity }}</td>
+                    <td>
+                        <form action="{% url 'remove_from_cart' item.id %}" method="POST">
+                            {% csrf_token %}
+                            <button>Remove</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{% url 'Checkout' item.id %}" method="POST">
+                            {% csrf_token %}
+                            <button>Select Item for Checkout(Click Once)</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>Total</td>
+                <td></td>
+                <td>{{ order_total }}</td>
+                <td></td>
+            </tr>
+            </tfoot>
+        </table>
+         <a class="btn btn-success" href="{% url 'checkout3' %}">Checkout</a>
+    </div>
+{% endblock content %}

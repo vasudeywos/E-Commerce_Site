@@ -1,0 +1,44 @@
+{% extends 'order/main.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto flex flex-wrap items-start py-6 px-6 xl:px-0">
+    <form method="post" action="{% url 'start_order' %}">
+        {% csrf_token %}
+        <div class="products w-full lg:w-3/4">
+            <h1 class="mb-5 text-3xl">Checkout</h1>
+
+            <div class="w-full pr-6">
+                <div class="mb-6 p-6 bg-gray-100 rounded-xl">
+                    <h2 class="mb-5 uppercase text-lg">Shipping information</h2>
+
+
+                    <div class="mb-4">
+                        <label class="inline-block mb-2">Address</label>
+                        <input name="address" type="text" class="w-full p-5 rounded-xl">
+                    </div>
+
+
+                    <div class="mb-4">
+                        <label class="inline-block mb-2">Email</label>
+                        <input name="email" type="email" class="w-full p-5 rounded-xl" value="{{ request.user.email }}">
+                    </div>
+
+
+
+        <div class="summary w-full w-1/4 p-6 bg-gray-100 rounded-xl mt-3">
+            <h2 class="uppercase text-lg mb-5">Summary</h2>
+
+            <div class="mb-6 flex justify-between">
+                <span class="font-semibold">Total</span>
+                <span>${{ order_total }}</span>
+            </div>
+
+            <button class="inline-block px-8 py-4 rounded-xl bg-purple-500 hover:bg-purple-700 text-white">
+                Confirm checkout
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

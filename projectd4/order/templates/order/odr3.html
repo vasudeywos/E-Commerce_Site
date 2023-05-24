@@ -1,0 +1,15 @@
+{% extends "order/base.html" %}
+{% block content %}
+    {%for or in ord|sorted:'total_quantity'%}
+            <article class="media content-section">
+               <div class="media-body">
+                  <div class="article-metadata">
+                  <a class="mr-2" href="#"></a>
+                </div>
+                   <div class="col-lg-4">
+                    <p class="article-content">Product Name-{{ or.product.Name}}</p>
+                    <p class="article-content">Product Sales-{{ or.total_quantity }}</p>
+               </div>
+            </article>
+    {%endfor%}
+{% endblock content %}

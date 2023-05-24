@@ -1,0 +1,84 @@
+class Customer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    name = models.CharField(max_length=50)
+    email=models.EmailField()
+
+    #to save the data
+    def register(self):
+        self.save()
+
+
+    @staticmethod
+    def get_customer_by_email(email):
+        try:
+            return Customer.objects.get(email= email)
+        except:
+            return False
+
+
+    def isExists(self):
+        if Customer.objects.filter(email = self.email):
+            return True
+
+        return False
+
+    def __str__(self):
+        return self.user.name
+
+<ul class=" navbar-nav my-2 my-lg-0">
+
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'cart'%}">Cart
+            <span class="badge badge-success">{{request.session.cart.keys|length}}</span>
+            <span class="sr-only">(current)</span></a>
+        </li>
+
+
+@method_decorator([login_required, customer_required], name='dispatch')
+def checkout(request):
+    try:
+        cart_id = request.session['cart_id']
+    except KeyError:
+        return HttpResponseRedirect(reverse('view_cart'))
+    try:
+        cart = Cart.objects.get(id=cart_id)
+    except Cart.DoesNotExist:
+        return HttpResponseRedirect(reverse('view_cart'))
+
+
+    try:
+        order = Order.objects.get(cart=cart)
+    except Order.DoesNotExist:
+        order_id = OrderIdGenerator.generate_order_id()
+        order = Order(cart=cart, id=order_id, user=request.user)
+        order.save()
+
+    if order.status == 'finished':
+        try:
+            del request.session['cart_id']
+            del request.session['cart_count']
+        except KeyError:
+            pass
+        return HttpResponseRedirect(reverse('view_cart'))
+    context = {
+        'orders': order
+    }
+    template = 'order/checkout.html'
+    return render(request, template, context)
+
+@method_decorator([login_required, customer_required], name='dispatch')
+def orders(request):
+    Order.objects.filter(user=request.user)
+    context = {}
+    template = 'order/orders.html'
+    return render(request, template, context)
+
+ address = request.POST.get("address")
+            email = request.POST.get("email")
+            customer = request.session.get("customer")
+
+            order = Order( user=request.user,product=product, price=(product.Price)*(quantity), address=address,
+                              email=email, quantity=quantity)
+            order.save()
+            request.session['cart_count'] -= quantity
+            update_cart_info(request)

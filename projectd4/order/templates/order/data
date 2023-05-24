@@ -1,0 +1,137 @@
+@method_decorator([login_required, customer_required], name='dispatch')
+class OrderView(View):
+
+    def get(self , request ):
+        customer = request.session.get('customer')
+        orders = Order.get_orders_by_customer(customer)
+        return render(request, 'order/orders.html', {'orders' : orders})
+
+@method_decorator([login_required, customer_required], name='dispatch')
+def store2(request):
+    products = Products.objects.all()
+    context = {'products':products}
+    return render(request, 'order/store.html', context)
+
+
+def get_user_pending_order(request):
+    # get order for the correct user
+    user_profile = get_object_or_404(Customer, user=request.user)
+    order = Order.objects.filter(customer=user_profile, is_ordered=False)
+    if order.exists():
+        # get the only order in the list of filtered orders
+        return order[0]
+    return 0
+
+@login_required
+def product_list(request):
+    object_list = Products.objects.all()
+    filtered_orders = Order.objects.filter(user=request.user, is_ordered=False)
+    current_order_products = []
+    if filtered_orders.exists():
+        user_order = filtered_orders[0]
+        user_order_items = user_order.items.all()
+        current_order_products = [product.product for product in user_order_items]
+
+    context = {
+        'object_list': object_list,
+        'current_order_products': current_order_products
+    }
+
+    return render(request, "order/customprodlst.html", context)
+
+@login_required()
+def order_details(request, **kwargs):
+    existing_order = get_user_pending_order(request)
+    context = {
+        'order': existing_order
+    }
+    return render(request, 'order/ordersumm.html', context)
+
+
+def shop(request):
+    categories = Category.objects.all()
+    products = Products.objects.all()
+
+    active_category = request.GET.get('category', '')
+
+    if active_category:
+        products = products.filter(category__slug=active_category)
+
+    query = request.GET.get('query', '')
+
+    if query:
+        products = products.filter(Q(name__icontains=query) | Q(description__icontains=query))
+
+    context = {
+        'categories': categories,
+        'products': products,
+        'active_category': active_category
+    }
+
+    return render(request, 'core/shop.html', context)
+
+@login_required
+def checkout(request):
+        cart_id = request.session.get('cart_id')
+
+        cart = Cart.objects.get(user=request.user)
+
+        order = Order(cart=cart,user=request.user)
+        order.save()
+
+        if order.status == 'finished':
+            try:
+                del request.session['cart_id']
+                del request.session['cart_count']
+            except KeyError:
+                pass
+            return HttpResponseRedirect(reverse('view_cart'))
+        context = {
+            'orders': orders
+        }
+        template = 'order/checkout.html'
+        return render(request, template, context)
+
+lass CartView(View):
+    def get(self , request):
+        ids = list(request.session.get('cart').keys())
+        products = Products.get_products_by_id(ids)
+        print(products)
+        return render(request , 'order/cart.html' , {'products' : products} )
+
+def checkout3(request):
+    if request.method == "POST":
+        address = request.POST.get("address")
+        email = request.POST.get("email")
+        customer = request.session.get("customer")
+        cart_id = request.session['cart_id']
+        cart = request.session.get("cart")
+        products = Products.get_products_by_id(list(cart.keys()))
+
+        for product in products:
+            order = Order(customer=Customer(id=customer), product=product, price=product.price, address=address,
+                          email=email, quantity=cart.quantity)
+            order.save()
+
+            return redirect("view_cart")
+    else:
+        return render(request, 'order/checkout3.html')
+
+def Checkout(request, no):
+    #if request.POST:
+    if request.method == "POST":
+            cart_item = CartItem.objects.get(id=no)
+            quantity = cart_item.quantity
+            product=cart_item.product
+            address = request.POST.get("address")
+            email = request.POST.get("email")
+            customer = request.session.get("customer")
+
+            order = Order( user=request.user,product=product, price=(product.Price)*(quantity), address=address,
+                              email=email, quantity=quantity)
+            order.save()
+            request.session['cart_count'] -= quantity
+            update_cart_info(request)
+            return render(request, 'order/checkout3.html',)
+    else:
+            return render(request, 'order/checkout3.html')
