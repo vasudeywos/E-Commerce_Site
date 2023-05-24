@@ -1,0 +1,11 @@
+{% extends 'order/main.html' %}
+
+{% block content %}
+  <h2>Add Money</h2>
+  <form method="post">
+    {% csrf_token %}
+    <label for="amount">Amount:</label>
+    <input type="number" name="amount" min="0" required>
+    <button type="submit">Add Money</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "order/base.html" %}
+{% block content %}
+    {%for or in orde %}
+        {%if or.product.author == user %}
+                <article class="media content-section">
+                   <div class="media-body">
+                      <div class="article-metadata">
+                      <a class="mr-2" href="#"></a>
+                    </div>
+                       <div class="col-lg-4">
+                        <img class="thumbnail" src="{{or.imageURL}}">
+                        <div class="box-element product"><h2>Order Name-{{ or.product }}</h2>
+                      <p class="article-content">Order Price-{{ or.price }}</p>
+                        <p class="article-content">Quantity-{{ or.quantity}}</p>
+                            <p class="article-content">{{ or.order.user}}</p>
+                   </div>
+                </article>
+            {%endif %}
+        {%endfor%}
+{% endblock content %}
