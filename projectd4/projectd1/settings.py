@@ -158,8 +158,13 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
-        }
-    }
+        },
+        'APP': {
+            'client_id': 'client id',
+            'secret': 'secret key',
+            'key': '',
+        },
+    },
 }
 
 MAILJET_API_KEY = '448c83cf8eb345c2caf2904ce73e980c'
